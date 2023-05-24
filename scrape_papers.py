@@ -129,3 +129,26 @@ def scrape_scholar(scholar_id, driver):
     df['author'] = soup.find_all(id='gsc_prf_in')[0].text.strip()
     df['scholar_id'] = scholar_id
     return df
+
+def get_ieee_year(paper_tag):
+    desc = paper_tag.find_all(class_='description')[0].text
+    ix = desc.find('Year: ')
+    year_str = desc[ix+6:ix+10]
+    return year_str
+
+def scrape_ieee(url, driver):
+    print(f'Scraping {url}')
+    driver.get(url)
+    time.sleep(10)
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
+    #print(soup)
+    paper_tags = soup.find_all(class_='result-item')
+    #print(paper_tags)
+    data_dict = {'title': [p.find('h2').text for p in paper_tags],
+                 'ieee_url': ['https://ieeexplore.ieee.org/'+p.find('a').get('href') for p in paper_tags],
+                 'author_list': [p.find(class_='author').text.split(';') for p in paper_tags],
+                 'ieee_year_str': [get_ieee_year(p) for p in paper_tags]}
+    df = pd.DataFrame(data=data_dict)
+    df['source_url'] = url
+    df['date'] = pd.to_datetime(df['ieee_year_str'], format='mixed', errors='ignore')
+    return df
