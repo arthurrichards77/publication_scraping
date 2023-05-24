@@ -1,3 +1,4 @@
+from argparse import ArgumentParser
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -152,3 +153,17 @@ def scrape_ieee(url, driver):
     df['source_url'] = url
     df['date'] = pd.to_datetime(df['ieee_year_str'], format='mixed', errors='ignore')
     return df
+
+if __name__=='__main__':
+    parser = ArgumentParser(prog='test_scrapers',
+                            description='cmmand line utility for publication scraping')
+    parser.add_argument('-s','--scholar',help='User ID on Google Scholar')
+    parser.add_argument('-i','--ieee',help='IEEExplore URL')
+    parser.add_argument('-b','--bristol',help='UoB person identifier')
+    parser.add_argument('-o','--orcid',help='Individual ORCID')
+    args = parser.parse_args()
+    if args.scholar:
+        driver = start_driver()
+        df = scrape_scholar(args.scholar, driver)
+        driver.quit()
+        df.to_csv('scholar_data.csv')

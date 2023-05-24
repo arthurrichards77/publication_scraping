@@ -1,4 +1,4 @@
-from scrape_papers import *
+from scrape_papers import start_driver, scrape_ieee, scrape_scholar
 
 def test_ieee():
     driver = start_driver()
