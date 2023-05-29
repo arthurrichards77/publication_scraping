@@ -16,6 +16,12 @@ def test_scholar():
     print(df)
     assert df.shape==(151,7)
 
+def test_scholar_lookup():
+    scraper = PublicationScraper()
+    scholar_id = scraper.lookup_scholar('Andrew Conn')
+    print(scholar_id)
+    assert scholar_id=='KdxFB88AAAAJ'
+
 if __name__=='__main__':
     test_ieee()
     test_scholar()

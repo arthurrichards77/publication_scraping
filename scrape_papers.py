@@ -145,6 +145,22 @@ class PublicationScraper:
         df['scholar_id'] = scholar_id
         return df
 
+    def lookup_scholar(self, search_name):
+        "Look up Google Scholar ID of an individual by name"
+        if self.driver is None:
+            self.startdriver()
+        search_term = search_name.lower().replace(' ','+')
+        url=f'https://scholar.google.com/citations?view_op=search_authors&hl=en&mauthors={search_term}+bristol&btnG='
+        print(f'Searching {url}')
+        self.driver.get(url)
+        time.sleep(10)
+        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+        h3_tag = soup.find('h3')
+        target_url = h3_tag.find('a').get('href')
+        split_it = target_url.split('=')
+        user_id = split_it[-1]
+        return user_id
+
     def scrape_ieee(self, url):
         if self.driver is None:
             self.startdriver()
@@ -176,9 +192,13 @@ if __name__=='__main__':
     parser.add_argument('-i','--ieee',help='IEEExplore URL')
     parser.add_argument('-b','--bristol',help='UoB person identifier')
     parser.add_argument('-o','--orcid',help='Individual ORCID')
+    parser.add_argument('-q','--query',help='Look up author links by name')
     args = parser.parse_args()
     scraper = PublicationScraper()
     if args.scholar:
         res = scraper.scrape_scholar(args.scholar)
         scraper.driver.quit()
         res.to_csv('scholar_data.csv')
+    elif args.query:
+        scholar_id = scraper.lookup_scholar(args.query)
+        print(f'Scholar ID is {scholar_id}')
