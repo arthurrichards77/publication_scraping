@@ -109,7 +109,9 @@ class PublicationScraper:
         resp = requests.get(url, timeout=60)
         soup = BeautifulSoup(resp.text, 'html.parser')
         top_result = soup.find(class_="content")
-        result_url = top_result.find('a').get("href")
+        result_url = top_result.a.get("href")
+        if result_url=='https://worktribe.com':
+            result_url = None
         return result_url
 
     def start_driver(self):
@@ -198,9 +200,12 @@ class PublicationScraper:
         time.sleep(10)
         soup = BeautifulSoup(self.driver.page_source, 'html.parser')
         h3_tag = soup.find('h3')
-        target_url = h3_tag.find('a').get('href')
-        split_it = target_url.split('=')
-        user_id = split_it[-1]
+        try:
+            target_url = h3_tag.a.get('href')
+            split_it = target_url.split('=')
+            user_id = split_it[-1]
+        except AttributeError:
+            user_id = None
         return user_id
 
     def scrape_ieee(self, url):
@@ -239,7 +244,6 @@ if __name__=='__main__':
     parser.add_argument('-q','--query',help='Look up author links by name')
     args = parser.parse_args()
     scraper = PublicationScraper()
-    res = None
     if args.scholar:
         res = scraper.scrape_scholar(args.scholar)
         scraper.quit()
