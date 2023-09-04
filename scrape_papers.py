@@ -115,19 +115,21 @@ class PublicationScraper:
         return result_url
 
     def start_driver(self):
-        "Start a Selenium web driver for web scraping"
-        # start by defining the options
-        options = webdriver.ChromeOptions()
-        options.add_argument('--headless') # it's more scalable to work in headless mode
-        # normally, selenium waits for all resources to download
-        # we don't need it as the page also populated with the running javascript code.
-        options.page_load_strategy = 'none'
-        # this returns the path web driver downloaded
-        chrome_path = ChromeDriverManager().install()
-        chrome_service = Service(chrome_path)
-        # pass the defined options and service objects to initialize the web driver
-        self.driver = Chrome(options=options, service=chrome_service)
-        self.driver.implicitly_wait(5)
+        self.driver = webdriver.Firefox()
+        if False:
+            "Start a Selenium web driver for web scraping"
+            # start by defining the options
+            options = webdriver.ChromeOptions()
+            options.add_argument('--headless') # it's more scalable to work in headless mode
+            # normally, selenium waits for all resources to download
+            # we don't need it as the page also populated with the running javascript code.
+            options.page_load_strategy = 'none'
+            # this returns the path web driver downloaded
+            chrome_path = ChromeDriverManager().install()
+            chrome_service = Service(chrome_path)
+            # pass the defined options and service objects to initialize the web driver
+            self.driver = Chrome(options=options, service=chrome_service)
+            self.driver.implicitly_wait(5)
 
     def quit(self):
         "Close down any hanging web connections"
